@@ -1,18 +1,12 @@
 #!/bin/bash
-#
-# https://github.com/P3TERX/Actions-OpenWrt
-# File name: diy-part1.sh
-# Description: OpenWrt DIY script part 1 (Before Update feeds)
-#
-# Copyright (c) 2019-2024 P3TERX <https://p3terx.com>
-#
-# This is free software, licensed under the MIT License.
-# See /LICENSE for more information.
-#
+# =============================================================
+# diy-part1.sh — P3TERX/Actions-OpenWrt 模板: feeds update 前执行
+# 接入第三方软件源 (PassWall / AdGuardHome / 微信推送)
+# =============================================================
 
-# Uncomment a feed source
-#sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
+git clone -b master --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall.git package/passwall-luci
+git clone -b master --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git package/passwall-packages
+git clone -b master --depth 1 https://github.com/kongfl888/luci-app-adguardhome.git package/luci-app-adguardhome
+git clone -b master --depth 1 https://github.com/tty228/luci-app-serverchan.git package/luci-app-serverchan
 
-# Add a feed source
-echo 'src-git helloworld https://github.com/fw876/helloworld' >>feeds.conf.default
-#echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
+echo "diy-part1.sh done: 第三方源已接入"
