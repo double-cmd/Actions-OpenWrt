@@ -19,8 +19,8 @@ config interface 'lan'
 config interface 'wan'
 	option device 'eth1'
 	option proto 'pppoe'
-	option username '037106025297'
-	option password '880517'
+	# 宽带账号/密码请勿写入本文件: 固件随 release 公开, 任何人可解包提取。
+	# 刷机后请在 LuCI 网络 -> 接口 -> WAN 手动填入 PPPoE 账号密码。
 	option ipv6 'auto'
 
 config interface 'wan6'
