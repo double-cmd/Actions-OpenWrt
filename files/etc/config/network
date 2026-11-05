@@ -7,7 +7,7 @@ config interface 'loopback'
 config device
 	option name 'br-lan'
 	option type 'bridge'
-	list ports 'eth1'
+	list ports 'eth0'
 
 config interface 'lan'
 	option device 'br-lan'
@@ -17,12 +17,12 @@ config interface 'lan'
 	option ip6assign '60'
 
 config interface 'wan'
-	option device 'eth0'
+	option device 'eth1'
 	option proto 'pppoe'
 	option username '037106025297'
 	option password '880517'
 	option ipv6 'auto'
 
 config interface 'wan6'
-	option device 'eth0'
+	option device 'eth1'
 	option proto 'dhcpv6'
