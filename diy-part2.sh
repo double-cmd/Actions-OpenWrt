@@ -19,15 +19,9 @@ done
 sed -i '/^CONFIG_PACKAGE_luci-theme-argon=y/d' .config 2>/dev/null
 echo "CONFIG_PACKAGE_luci-theme-argon=y" >> .config
 
-# 5. 月度自动升级只保留 AdGuard 核心更新:
-#    整段注释掉 opkg update 与 opkg upgrade 循环 (跳版本升级会导致 PassWall 起不来)
-sed -i '/^opkg update /s/^/# /' files/usr/bin/autoupdate.sh 2>/dev/null
-sed -i '/^for p in luci-app-passwall/,/^done/s/^/# /' files/usr/bin/autoupdate.sh 2>/dev/null
-
-# 6. 自检: 确认 4 处改动真的落盘
+# 5. 自检: 确认关键改动真的落盘
 grep -q "list ports 'eth0'" files/etc/config/network || echo "[WARN] network 端口未改成功"
 grep -q "/luci-static/argon" files/etc/uci-defaults/99-custom.sh || echo "[WARN] 主题未改成功"
 grep -q "luci-theme-argon" .config || echo "[WARN] argon 未写入 .config"
-grep -c "^# " files/usr/bin/autoupdate.sh | sed 's/^/[INFO] autoupdate 已注释行数: /'
 
 echo "diy-part2.sh done: 编译配置后处理完成"
