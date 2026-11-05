@@ -13,6 +13,8 @@
 name: OpenWrt Builder
 
 on:
+  push:
+    branches: [ main ]
   repository_dispatch:
   workflow_dispatch:
 

@@ -15,18 +15,30 @@ for p in luci-app-ssr-plus luci-app-rclone luci-app-vssr luci-app-eqos-mtk; do
 	sed -i "/^CONFIG_PACKAGE_${p}=y/d" .config 2>/dev/null
 done
 
-# 4. 默认主题换成 Argon (与现有路由器界面一致); 保留 material 作为兜底
+# 4. 默认主题 Vantage (用户选定): 外部源码编入主题+仪表盘+中文语言包
+#    (一个仓库含 luci-theme-vantage 与 luci-app-vantage 两个包, 分开放到 package/)
+git clone -q --depth 1 https://github.com/anothaDev/luci-theme-vantage.git /tmp/vantage-src
+cp -r /tmp/vantage-src/luci-theme-vantage package/
+cp -r /tmp/vantage-src/luci-app-vantage package/
+rm -rf /tmp/vantage-src
+for p in luci-theme-vantage luci-app-vantage luci-i18n-vantage-zh-cn luci-i18n-vantage-theme-zh-cn; do
+	sed -i "/^CONFIG_PACKAGE_${p}=y/d" .config 2>/dev/null
+	echo "CONFIG_PACKAGE_${p}=y" >> .config
+done
+
+# 5. 保留 Argon 作兜底主题 (Vantage 异常时可切回)
 sed -i '/^CONFIG_PACKAGE_luci-theme-argon=y/d' .config 2>/dev/null
 echo "CONFIG_PACKAGE_luci-theme-argon=y" >> .config
 
-# 5. AdGuardHome 本体编入固件: 官方界面, 免联网下载核心 (壳 luci-app-adguardhome 保留作快捷入口)
+# 6. AdGuardHome 本体编入固件: 官方界面, 免联网下载核心 (壳 luci-app-adguardhome 保留作快捷入口)
 sed -i '/^CONFIG_PACKAGE_adguardhome=y/d' .config 2>/dev/null
 echo "CONFIG_PACKAGE_adguardhome=y" >> .config
 
-# 6. 自检: 确认关键改动真的落盘
+# 7. 自检: 确认关键改动真的落盘
 grep -q "list ports 'eth0'" files/etc/config/network || echo "[WARN] network 端口未改成功"
-grep -q "/luci-static/argon" files/etc/uci-defaults/99-custom.sh || echo "[WARN] 主题未改成功"
-grep -q "luci-theme-argon" .config || echo "[WARN] argon 未写入 .config"
+grep -q "/luci-static/vantage" files/etc/uci-defaults/99-custom.sh || echo "[WARN] 主题未改成功"
+grep -q "luci-theme-vantage" .config || echo "[WARN] vantage 未写入 .config"
 grep -q "^CONFIG_PACKAGE_adguardhome=y" .config || echo "[WARN] adguardhome 未写入 .config"
+[ -d package/luci-theme-vantage ] || echo "[WARN] vantage 源码未 clone 到 package"
 
 echo "diy-part2.sh done: 编译配置后处理完成"
