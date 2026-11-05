@@ -19,9 +19,14 @@ done
 sed -i '/^CONFIG_PACKAGE_luci-theme-argon=y/d' .config 2>/dev/null
 echo "CONFIG_PACKAGE_luci-theme-argon=y" >> .config
 
-# 5. 自检: 确认关键改动真的落盘
+# 5. AdGuardHome 本体编入固件: 官方界面, 免联网下载核心 (壳 luci-app-adguardhome 保留作快捷入口)
+sed -i '/^CONFIG_PACKAGE_adguardhome=y/d' .config 2>/dev/null
+echo "CONFIG_PACKAGE_adguardhome=y" >> .config
+
+# 6. 自检: 确认关键改动真的落盘
 grep -q "list ports 'eth0'" files/etc/config/network || echo "[WARN] network 端口未改成功"
 grep -q "/luci-static/argon" files/etc/uci-defaults/99-custom.sh || echo "[WARN] 主题未改成功"
 grep -q "luci-theme-argon" .config || echo "[WARN] argon 未写入 .config"
+grep -q "^CONFIG_PACKAGE_adguardhome=y" .config || echo "[WARN] adguardhome 未写入 .config"
 
 echo "diy-part2.sh done: 编译配置后处理完成"
