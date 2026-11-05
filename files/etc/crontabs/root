@@ -1,6 +1,0 @@
-# 每月 1 日 03:00 自动更新
-0 3 1 * * /usr/bin/autoupdate.sh
-# 每周日 04:00 自动重启
-0 4 * * 0 sleep 5 && reboot
-# 每 5 分钟网络波动检测
-*/5 * * * * /usr/bin/network_monitor.sh
