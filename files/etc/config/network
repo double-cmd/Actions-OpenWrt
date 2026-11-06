@@ -1,10 +1,19 @@
-# 宽带账号/密码不写入公开仓库（安全）。
-# 刷机后如需重新拨号：LuCI → 网络 → 接口 → wan，填入运营商提供的账号密码。
+# =============================================================
+# GL-MT3000 通用版默认网络配置
+# LAN  : 192.168.1.168/24  (br-lan, eth1 = 1G 网口)
+# WAN  : eth0 = 2.5G 网口, PPPoE 账号密码留空, 刷机后自行填写
+# 说明 : LAN 接口不写 gateway。客户端由 DHCP 自动下发网关 192.168.1.168，
+#        在 LAN 接口上写死 gateway 会形成指向自身的默认路由，反而易断网。
+# =============================================================
+
 config interface 'loopback'
 	option device 'lo'
 	option proto 'static'
 	option ipaddr '127.0.0.1'
 	option netmask '255.0.0.0'
+
+config globals 'globals'
+	option packet_steering '1'
 
 config device
 	option name 'br-lan'
@@ -14,9 +23,9 @@ config device
 config interface 'lan'
 	option device 'br-lan'
 	option proto 'static'
-	option ipaddr '192.168.1.168'
 	option netmask '255.255.255.0'
 	option ip6assign '60'
+	list ipaddr '192.168.1.168'
 
 config interface 'wan'
 	option device 'eth0'
