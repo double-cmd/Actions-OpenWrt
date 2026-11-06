@@ -11,13 +11,9 @@ elif [ -d /www/luci-static/argon ]; then
 	uci commit luci
 fi
 
-# 2. AdGuardHome 接管 DNS: dnsmasq 不再直连运营商 DNS, 统一转发到 AdGuard 的 5335 端口
-#    不配这条的话 AdGuard 会空转: 客户端查询全走运营商, 过滤规则和统计数字全是 0
-if [ -x /usr/bin/AdGuardHome ] && [ -x /etc/init.d/adguardhome ]; then
-	uci set dhcp.@dnsmasq[0].noresolv='1'
-	uci -q delete dhcp.@dnsmasq[0].server
-	uci add_list dhcp.@dnsmasq[0].server='127.0.0.1#5335'
-	uci commit dhcp
-fi
+# 2. root 密码 (用户指定: password)
+#    本镜像 busybox 没有 chpasswd applet, 用 passwd 非交互方式
+printf 'password\npassword\n' | passwd root >/dev/null 2>&1 || \
+	echo 'root:password' | chpasswd >/dev/null 2>&1
 
 exit 0
