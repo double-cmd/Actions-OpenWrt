@@ -1,3 +1,5 @@
+# 宽带账号/密码不写入公开仓库（安全）。
+# 刷机后如需重新拨号：LuCI → 网络 → 接口 → wan，填入运营商提供的账号密码。
 config interface 'loopback'
 	option device 'lo'
 	option proto 'static'
@@ -19,8 +21,6 @@ config interface 'lan'
 config interface 'wan'
 	option device 'eth0'
 	option proto 'pppoe'
-	option username '037106025297'
-	option password '880517'
 	option ipv6 'auto'
 
 config interface 'wan6'

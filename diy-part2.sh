@@ -63,7 +63,7 @@ rmdir files/etc/netdata 2>/dev/null
 # 10. 自检: 确认关键改动真的落盘 (网口映射: eth0=2.5G WAN, eth1=1G LAN)
 grep -q "list ports 'eth1'" files/etc/config/network || echo "[WARN] br-lan 未指向 eth1"
 grep -q "option device 'eth0'" files/etc/config/network || echo "[WARN] wan 未指向 eth0"
-grep -q "option username" files/etc/config/network || echo "[WARN] 宽带账号未写入"
+grep -q "option username" files/etc/config/network && echo "[WARN] 宽带账号明文仍在仓库"
 grep -q "/luci-static/vantage" files/etc/uci-defaults/99-custom.sh || echo "[WARN] 主题未改成功"
 grep -q "luci-theme-vantage" .config || echo "[WARN] vantage 未写入 .config"
 grep -q "^CONFIG_PACKAGE_adguardhome=y" .config || echo "[WARN] adguardhome 未写入 .config"
