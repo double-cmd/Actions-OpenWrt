@@ -34,16 +34,29 @@ echo "CONFIG_PACKAGE_luci-theme-argon=y" >> .config
 sed -i '/^CONFIG_PACKAGE_adguardhome=y/d' .config 2>/dev/null
 echo "CONFIG_PACKAGE_adguardhome=y" >> .config
 
-# 7. 自检: 确认关键改动真的落盘 (网口映射: eth0=2.5G WAN, eth1=1G LAN)
+# 7. 微信推送 PushPlus (用户要求): tty228/luci-app-wechatpush
+#    支持 推送加(PushPlus) / Server酱 / WxPusher / WPUSH / 企业微信 / Telegram / 邮件
+#    依赖: iputils-arping + curl + jq + bash
+git clone -q --depth 1 https://github.com/tty228/luci-app-wechatpush.git /tmp/wp-src
+cp -r /tmp/wp-src package/luci-app-wechatpush
+rm -rf /tmp/wp-src
+for p in luci-app-wechatpush iputils-arping curl jq bash; do
+	sed -i "/^CONFIG_PACKAGE_${p}=/d" .config 2>/dev/null
+	echo "CONFIG_PACKAGE_${p}=y" >> .config
+done
+
+# 8. 自检: 确认关键改动真的落盘 (网口映射: eth0=2.5G WAN, eth1=1G LAN)
 grep -q "list ports 'eth1'" files/etc/config/network || echo "[WARN] br-lan 未指向 eth1"
 grep -q "option device 'eth0'" files/etc/config/network || echo "[WARN] wan 未指向 eth0"
 grep -q "option username" files/etc/config/network || echo "[WARN] 宽带账号未写入"
 grep -q "/luci-static/vantage" files/etc/uci-defaults/99-custom.sh || echo "[WARN] 主题未改成功"
 grep -q "luci-theme-vantage" .config || echo "[WARN] vantage 未写入 .config"
 grep -q "^CONFIG_PACKAGE_adguardhome=y" .config || echo "[WARN] adguardhome 未写入 .config"
+grep -q "^CONFIG_PACKAGE_luci-app-wechatpush=y" .config || echo "[WARN] wechatpush 未写入 .config"
 grep -q "^CONFIG_PACKAGE_ttyd=y" .config && echo "[WARN] ttyd 仍然存在"
 [ -d package/luci-theme-vantage ] || echo "[WARN] vantage 源码未 clone 到 package"
+[ -d package/luci-app-wechatpush ] || echo "[WARN] wechatpush 源码未 clone 到 package"
 
-# 8. netdata 已由 files/etc/netdata/netdata.conf 限制为仅 127.0.0.1 监听 (安全加固)
+# 9. netdata 已由 files/etc/netdata/netdata.conf 限制为仅 127.0.0.1 监听 (安全加固)
 
- echo "diy-part2.sh done: 编译配置后处理完成"
+echo "diy-part2.sh done: 编译配置后处理完成"
