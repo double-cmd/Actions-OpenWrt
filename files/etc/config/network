@@ -7,23 +7,22 @@ config interface 'loopback'
 config device
 	option name 'br-lan'
 	option type 'bridge'
-	list ports 'eth0'
+	list ports 'eth1'
 
 config interface 'lan'
 	option device 'br-lan'
 	option proto 'static'
 	option ipaddr '192.168.1.168'
 	option netmask '255.255.255.0'
-	option gateway '192.168.1.168'
 	option ip6assign '60'
 
 config interface 'wan'
-	option device 'eth1'
+	option device 'eth0'
 	option proto 'pppoe'
-	# 宽带账号/密码请勿写入本文件: 固件随 release 公开, 任何人可解包提取。
-	# 刷机后请在 LuCI 网络 -> 接口 -> WAN 手动填入 PPPoE 账号密码。
+	option username '037106025297'
+	option password '880517'
 	option ipv6 'auto'
 
 config interface 'wan6'
-	option device 'eth1'
+	option device '@wan'
 	option proto 'dhcpv6'
