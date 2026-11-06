@@ -10,9 +10,16 @@ sed -i 's/^CONFIG_PACKAGE_dnsmasq=y/# CONFIG_PACKAGE_dnsmasq is not set/' .confi
 # 2. 单设备固件: 移除其他设备定义
 sed -i '/^CONFIG_TARGET_DEVICE_mediatek_filogic_DEVICE_/!b; /glinet_gl-mt3000/d' .config 2>/dev/null
 
-# 3. 移除不需要的默认应用 (含 Web 终端 ttyd: 用户明确不需要, 且会开 7681 端口)
-for p in luci-app-ssr-plus luci-app-rclone luci-app-vssr luci-app-eqos-mtk luci-app-ttyd ttyd luci-i18n-ttyd-zh-cn; do
+# 3. 移除不需要的默认应用
+#    - Web 终端 ttyd: 用户明确不需要, 且会开 7681 端口
+#    - netdata 监控: 用户要求卸载, 且会开 19999 端口
+ttyd_list="luci-app-ttyd ttyd luci-i18n-ttyd-zh-cn"
+netdata_list="luci-app-netdata netdata luci-i18n-netdata-zh-cn"
+for p in luci-app-ssr-plus luci-app-rclone luci-app-vssr luci-app-eqos-mtk $ttyd_list $netdata_list; do
 	sed -i "/^CONFIG_PACKAGE_${p}=y/d" .config 2>/dev/null
+done
+for p in luci-app-ttyd ttyd luci-i18n-ttyd-zh-cn luci-app-netdata netdata luci-i18n-netdata-zh-cn; do
+	sed -i "/^CONFIG_PACKAGE_${p}=/d" .config 2>/dev/null
 done
 
 # 4. 默认主题 Vantage (用户选定): 外部源码编入主题+仪表盘+中文语言包
@@ -45,7 +52,11 @@ for p in luci-app-wechatpush iputils-arping curl jq bash; do
 	echo "CONFIG_PACKAGE_${p}=y" >> .config
 done
 
-# 8. 自检: 确认关键改动真的落盘 (网口映射: eth0=2.5G WAN, eth1=1G LAN)
+# 8. 清理 netdata 配置残留 (不再随固件携带)
+rm -f files/etc/netdata/netdata.conf
+rmdir files/etc/netdata 2>/dev/null
+
+# 9. 自检: 确认关键改动真的落盘 (网口映射: eth0=2.5G WAN, eth1=1G LAN)
 grep -q "list ports 'eth1'" files/etc/config/network || echo "[WARN] br-lan 未指向 eth1"
 grep -q "option device 'eth0'" files/etc/config/network || echo "[WARN] wan 未指向 eth0"
 grep -q "option username" files/etc/config/network || echo "[WARN] 宽带账号未写入"
@@ -54,9 +65,8 @@ grep -q "luci-theme-vantage" .config || echo "[WARN] vantage 未写入 .config"
 grep -q "^CONFIG_PACKAGE_adguardhome=y" .config || echo "[WARN] adguardhome 未写入 .config"
 grep -q "^CONFIG_PACKAGE_luci-app-wechatpush=y" .config || echo "[WARN] wechatpush 未写入 .config"
 grep -q "^CONFIG_PACKAGE_ttyd=y" .config && echo "[WARN] ttyd 仍然存在"
+grep -q "^CONFIG_PACKAGE_netdata=y" .config && echo "[WARN] netdata 仍然存在"
 [ -d package/luci-theme-vantage ] || echo "[WARN] vantage 源码未 clone 到 package"
 [ -d package/luci-app-wechatpush ] || echo "[WARN] wechatpush 源码未 clone 到 package"
-
-# 9. netdata 已由 files/etc/netdata/netdata.conf 限制为仅 127.0.0.1 监听 (安全加固)
 
 echo "diy-part2.sh done: 编译配置后处理完成"
